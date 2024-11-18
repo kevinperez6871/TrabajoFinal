@@ -31,16 +31,16 @@ const estudiantesSchema = mongoose.Schema({
         default:false,
     }
 });
-//Antes de almacenar el registro - (pre)
-estudiantesSchema.pre('save', async function(){
-    const salt = await bcrypt.genSaltSync(10);
-    this.password = await bcrypt.hashSync(this.password, salt);
-});
+// // Antes de almacenar el registro - (pre)
+// estudiantesSchema.pre('save', async function(){
+//     const salt = await bcrypt.genSaltSync();
+//     this.password = await bcrypt.hashSync(this.password, salt);
+// });
 
-//Methods - solo ejecuta funciones en este modelo
-estudiantesSchema.methods.comprobarPassword = async function(passwordFormulario){
-    return await bcrypt.compare(passwordFormulario, this.password); //compare -> metodo booleano
-};
+// // Methods - solo ejecuta funciones en este modelo
+// estudiantesSchema.methods.comprobarPassword = function(passwordFormulario){
+//     return bcrypt.compareSync(passwordFormulario, this.password); //compare -> metodo booleano
+// };
 
 
 const estudiante = mongoose.model("estudiante",estudiantesSchema);

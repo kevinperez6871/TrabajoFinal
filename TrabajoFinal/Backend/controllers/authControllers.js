@@ -1,4 +1,5 @@
 import estudiante from "../models/estudiantes.js";
+import bcrypt from 'bcrypt'
 import JWT from "../helpers/JWT.js";
 
 const registro = async(req, res) =>{
@@ -14,8 +15,13 @@ const registro = async(req, res) =>{
     try {
         //Guardar un nuevo registo
       const NuevoEstudiante = new estudiante(req.body);
+      
+      //Encriptacion contraseña
+      const salt = bcrypt.genSaltSync();
+      NuevoEstudiante.password = bcrypt.hashSync(password, salt);
+      //
       const EstudianteGuardado = await NuevoEstudiante.save();
-    
+
       res.status(201).json(EstudianteGuardado);
     } catch (error) {
         console.log(error);
@@ -23,7 +29,7 @@ const registro = async(req, res) =>{
 };
 
 const perfil = (req, res) =>{
-    res.send('')
+    res.send('Mostrando Perfil')
 }
 
 const confirmarCuenta = async (req,res) => {
@@ -50,7 +56,6 @@ const confirmarCuenta = async (req,res) => {
 const autenticar = async(req, res) => {
     const {email, password} = req.body
 
-    //Validación de existencia del usuario
     const usuario = await estudiante.findOne({email});
 
     if(!usuario){
@@ -58,20 +63,24 @@ const autenticar = async(req, res) => {
         return res.status(401).json({msg: error.message});
     }
 
-    //Comprobar si el usuario esta confirmado
     if(!usuario.confirmado){
         const error = new Error('El correo no ha sido confirmado');
         return res.status(403).json({msg:error.message});
     }
-    // Comparar la contraseña ingresada con la hasheada
+
    // Verificar que el password sea correcto
-    if(await usuario.comprobarPassword(password)){
-        console.log('Pasword correcto')
-        res.json({})
+    const validarPassword = bcrypt.compareSync(password, usuario.password);
+   
+   if(validarPassword){  
+        //Almacenar JWT 
+        res.json({token: JWT(usuario.id)});
+        // return res.json({msg:"Contraseña Correcta"})
+        
     }else{
         const error = new Error('Password Incorrecto');
         return res.status(403).json({msg:error.message});
     }
+
 };
 
 export {registro, perfil, confirmarCuenta, autenticar}

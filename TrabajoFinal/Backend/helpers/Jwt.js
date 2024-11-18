@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 
-const JWT = () => { 
-    return jwt.sign({nombre: 'Juan'}, process.env.SECRET_JWT,{
+const JWT = (id) => {
+    //Información que se almacenara en el JWT
+    return jwt.sign({id}, process.env.JWT_SECRET,{
+        //Expiración JWT
         expiresIn: '20d',
     });
 };
