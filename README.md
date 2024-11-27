@@ -1,1 +1,1 @@
-# Conexion y registrtros en bases de datos
+# Conexion y registros en bases de datos
